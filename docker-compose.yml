@@ -88,6 +88,40 @@ version: '2'
 #-------------------------------------------------------------------------
 
 services:
+  # keycloak:
+  #   image: jboss/keycloak
+  #   container_name: keycloak_wekan
+  #   environment:
+  #   #   # Comment in the next two lines when run first time
+  #     - KEYCLOAK_USER=admin
+  #     - KEYCLOAK_PASSWORD=softstream
+  #     - DB_VENDOR=mysql
+  #     - DB_ADDR=db_keycloak
+  #     - DB_PORT=3306
+  #     - KEYCLOAK_LOGLEVEL=DEBUG
+  #     # - KEYCLOAK_IMPORT=./realm-export.json
+  #   volumes:
+  #     - ./realm-export.json:/tmp/realm-export.json
+  #   ports:
+  #     - "8081:8080"
+  #   networks:
+  #     - wekan-tier
+  #   depends_on:
+  #     - db_keycloak
+
+  # db_keycloak:
+  #   image: mysql:5.7
+  #   container_name: keycloak_db
+  #   restart: always
+  #   environment:
+  #     - MYSQL_ROOT_PASSWORD=root_password
+  #     - MYSQL_USER=keycloak
+  #     - MYSQL_PASSWORD=password
+  #     - MYSQL_DATABASE=keycloak
+  #   volumes:
+  #     - ./mysql_keycloak:/var/lib/mysql
+  #   networks:
+  #     - wekan-tier
 
   wekandb:
     #-------------------------------------------------------------------------------------
@@ -120,6 +154,7 @@ services:
     # image: quay.io/wekan/wekan:v1.95
     # c) Using Docker Hub automatic builds https://hub.docker.com/r/wekanteam/wekan
     image: wekanteam/wekan
+    # image: mquandalle/wekan
     # image: wekanteam/wekan:v2.99
     #-------------------------------------------------------------------------------------
     container_name: wekan-app
@@ -129,24 +164,24 @@ services:
     #-------------------------------------------------------------------------------------
     # ==== BUILD wekan-app DOCKER CONTAINER FROM SOURCE, if you uncomment these ====
     # ==== and use commands: docker-compose up -d --build
-    #build:
-    #  context: .
-    #  dockerfile: Dockerfile
-    #  args:
-    #    - NODE_VERSION=${NODE_VERSION}
-    #    - METEOR_RELEASE=${METEOR_RELEASE}
-    #    - NPM_VERSION=${NPM_VERSION}
-    #    - ARCHITECTURE=${ARCHITECTURE}
-    #    - SRC_PATH=${SRC_PATH}
-    #    - METEOR_EDGE=${METEOR_EDGE}
-    #    - USE_EDGE=${USE_EDGE}
+    build:
+     context: .
+     dockerfile: Dockerfile
+     args:
+       - NODE_VERSION=${NODE_VERSION}
+       - METEOR_RELEASE=${METEOR_RELEASE}
+       - NPM_VERSION=${NPM_VERSION}
+       - ARCHITECTURE=${ARCHITECTURE}
+       - SRC_PATH=${SRC_PATH}
+       - METEOR_EDGE=${METEOR_EDGE}
+       - USE_EDGE=${USE_EDGE}
     #-------------------------------------------------------------------------------------
     ports:
       # Docker outsideport:insideport. Do not add anything extra here.
       # For example, if you want to have wekan on port 3001,
       # use 3001:8080 . Do not add any extra address etc here, that way it does not work.
       # remove port mapping if you use nginx reverse proxy, port 8080 is already exposed to wekan-tier network
-      - 80:8080
+      - 8080:8080
     environment:
       - MONGO_URL=mongodb://wekandb:27017/wekan
       #---------------------------------------------------------------
@@ -161,7 +196,7 @@ services:
       #  - http://example.com
       #  - http://boards.example.com
       #  - http://192.168.1.100    <=== using at local LAN
-      - ROOT_URL=http://localhost  #   <=== using only at same laptop/desktop where Wekan is installed
+      - ROOT_URL=http://192.168.3.4:8080  #   <=== using only at same laptop/desktop where Wekan is installed
       #---------------------------------------------------------------
       # ==== EMAIL SETTINGS ====
       # Email settings are required in both MAIL_URL and Admin Panel,
@@ -324,7 +359,7 @@ services:
       #- WEBHOOKS_ATTRIBUTES=cardId,listId,oldListId,boardId,comment,user,card,commentId
       #-----------------------------------------------------------------
       # ==== Debug OIDC OAuth2 etc ====
-      #- DEBUG=true
+      - DEBUG=true
       #-----------------------------------------------------------------
       # ==== OAUTH2 AZURE ====
       # https://github.com/wekan/wekan/wiki/Azure
@@ -379,15 +414,19 @@ services:
       #-----------------------------------------------------------------
       # ==== OAUTH2 KEYCLOAK ====
       # https://github.com/wekan/wekan/wiki/Keycloak  <== MAPPING INFO, REQUIRED
-      #- OAUTH2_ENABLED=true
+      - OAUTH2_ENABLED=true
       # OAuth2 login style: popup or redirect.
-      #- OAUTH2_LOGIN_STYLE=redirect
-      #- OAUTH2_CLIENT_ID=<Keycloak create Client ID>
-      #- OAUTH2_SERVER_URL=<Keycloak server name>/auth
-      #- OAUTH2_AUTH_ENDPOINT=/realms/<keycloak realm>/protocol/openid-connect/auth
-      #- OAUTH2_USERINFO_ENDPOINT=/realms/<keycloak realm>/protocol/openid-connect/userinfo
-      #- OAUTH2_TOKEN_ENDPOINT=/realms/<keycloak realm>/protocol/openid-connect/token
-      #- OAUTH2_SECRET=<keycloak client secret>
+      - OAUTH2_LOGIN_STYLE=popup
+      - OAUTH2_CLIENT_ID=wekan
+      - OAUTH2_SERVER_URL=http://192.168.3.4:8081/auth
+      - OAUTH2_AUTH_ENDPOINT=/realms/Tomatek/protocol/openid-connect/auth
+      - OAUTH2_USERINFO_ENDPOINT=/realms/Tomatek/protocol/openid-connect/userinfo
+      - OAUTH2_TOKEN_ENDPOINT=/realms/Tomatek/protocol/openid-connect/token
+      - OAUTH2_SECRET=30b52119-b11f-46af-aeb5-a9070c5817d3
+      - OAUTH2_ID_MAP=test
+      - OAUTH2_USERNAME_MAP=test
+      - OAUTH2_FULLNAME_MAP=test
+      - OAUTH2_EMAIL_MAP=test@outlook.com
       #-----------------------------------------------------------------
       # ==== OAUTH2 DOORKEEPER ====
       # https://github.com/wekan/wekan/issues/1874
@@ -598,7 +637,7 @@ services:
       # example : LOGOUT_ON_MINUTES=55
       #- LOGOUT_ON_MINUTES=
       #-------------------------------------------------------------------
-      # Hide password login form 
+      # Hide password login form
       # - PASSWORD_LOGIN_ENABLED=true
       #-------------------------------------------------------------------
     depends_on:

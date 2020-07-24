@@ -15,6 +15,7 @@ OAuth.registerService('oidc', 2, null, function (query) {
   if (debug) console.log('XXX: userinfo:', userinfo);
 
   var serviceData = {};
+  if (debug) console.log('\n\n\n\n\n\n\n -----------  \n\n\n\n\n\n');
   serviceData.id = userinfo[process.env.OAUTH2_ID_MAP]; // || userinfo["id"];
   serviceData.username = userinfo[process.env.OAUTH2_USERNAME_MAP]; // || userinfo["uid"];
   serviceData.fullname = userinfo[process.env.OAUTH2_FULLNAME_MAP]; // || userinfo["displayName"];
