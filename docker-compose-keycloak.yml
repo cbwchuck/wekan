@@ -9,8 +9,8 @@ services:
       - DB_VENDOR=mysql
       - DB_ADDR=db_keycloak
       - DB_PORT=3306
-      - KEYCLOAK_USER=admin
-      - KEYCLOAK_PASSWORD=softstream
+      # - KEYCLOAK_USER=admin
+      # - KEYCLOAK_PASSWORD=softstream
       # - KEYCLOAK_IMPORT=./realm-export.json
     # volumes:
       # - ./realm-export.json:/opt/jboss/keycloak/realm-app.json

@@ -1,4 +1,4 @@
-FROM ubuntu:rolling
+FROM ubuntu:16.04
 LABEL maintainer="sgr"
 
 ENV BUILD_DEPS="gnupg gosu bsdtar wget curl bzip2 g++ build-essential python git ca-certificates iproute2"

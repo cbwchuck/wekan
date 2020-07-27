@@ -19,9 +19,13 @@ OAuth.registerService('oidc', 2, null, function (query) {
   serviceData.id = userinfo[process.env.OAUTH2_ID_MAP]; // || userinfo["id"];
   serviceData.username = userinfo[process.env.OAUTH2_USERNAME_MAP]; // || userinfo["uid"];
   serviceData.fullname = userinfo[process.env.OAUTH2_FULLNAME_MAP]; // || userinfo["displayName"];
+  // serviceData.id = userinfo["id"];
+  // serviceData.username = userinfo["uid"];
+  // serviceData.fullname = userinfo["displayName"];
   serviceData.accessToken = accessToken;
   serviceData.expiresAt = expiresAt;
   serviceData.email = userinfo[process.env.OAUTH2_EMAIL_MAP]; // || userinfo["email"];
+  // serviceData.email = userinfo["email"];
 
   if (accessToken) {
     var tokenContent = getTokenContent(accessToken);
@@ -36,6 +40,8 @@ OAuth.registerService('oidc', 2, null, function (query) {
   var profile = {};
   profile.name = userinfo[process.env.OAUTH2_FULLNAME_MAP]; // || userinfo["displayName"];
   profile.email = userinfo[process.env.OAUTH2_EMAIL_MAP]; // || userinfo["email"];
+  // profile.name = userinfo["displayName"];
+  // profile.email = userinfo["email"];
   if (debug) console.log('XXX: profile:', profile);
 
   return {
